@@ -1,5 +1,7 @@
-using ElevatorControlSystem;
+using ElevatorControl;
 using NUnit.Framework;
+using System;
+using System.Linq;
 
 
 namespace ElevatorSystemUnitTests
@@ -8,15 +10,36 @@ namespace ElevatorSystemUnitTests
     {
 
         [Test]
-        public void PressButton()
+        public void CreateElevators()
         {
             //ARRANGE
-            var ElevatorControl = new ElevatorControl();
-
-            //ACT
+            int numberOfElevators = 3;
+            var elevatorControl = new ElevatorControlUnit(numberOfElevators);
 
             //ASSERT
-            Assert.Pass();
+            Assert.AreEqual(numberOfElevators, elevatorControl.GetElevators().Count);
+        }
+
+        [Test]
+        public void FindClosestElevator()
+        {
+            //ARRANGE
+            int numberOfElevators = 3;
+            var elevatorControl = new ElevatorControlUnit(numberOfElevators);
+            var elevator = elevatorControl.GetElevators().OrderBy(e => e.CurrentFloor).FirstOrDefault();
+
+            //ACT
+            int callFloor = 2;
+
+            callFloor = (elevator.CurrentFloor == 2) ? 1 : 2;
+
+
+            var closestElevator = elevatorControl.FindClosestElevator(elevatorControl.GetElevators(), callFloor);
+
+
+
+            //ASSERT
+            Assert.AreEqual(elevator.id , closestElevator.id);
         }
     }
 }

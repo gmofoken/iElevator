@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Elevator\Elevator.csproj" />
+    <Folder Include="Models\" />
   </ItemGroup>
 
 </Project>
