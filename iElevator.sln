@@ -3,7 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.10.34902.84
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "iElevator", "iElevator\iElevator.csproj", "{93652A80-9092-4F5D-88D4-EDDE70828A5F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "iElevator", "iElevator\iElevator.csproj", "{93652A80-9092-4F5D-88D4-EDDE70828A5F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ElevatorControl", "ElevatorControl\ElevatorControl.csproj", "{7927EC26-BAA4-4928-ACDD-BA6ADFEE9E8D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ElevatorSystemUnitTests", "ElevatorSystemUnitTests\ElevatorSystemUnitTests.csproj", "{0B2C2ADE-579E-48DF-80BD-7BD1A3E5CB41}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +19,14 @@ Global
 		{93652A80-9092-4F5D-88D4-EDDE70828A5F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{93652A80-9092-4F5D-88D4-EDDE70828A5F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{93652A80-9092-4F5D-88D4-EDDE70828A5F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7927EC26-BAA4-4928-ACDD-BA6ADFEE9E8D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7927EC26-BAA4-4928-ACDD-BA6ADFEE9E8D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7927EC26-BAA4-4928-ACDD-BA6ADFEE9E8D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7927EC26-BAA4-4928-ACDD-BA6ADFEE9E8D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0B2C2ADE-579E-48DF-80BD-7BD1A3E5CB41}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0B2C2ADE-579E-48DF-80BD-7BD1A3E5CB41}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0B2C2ADE-579E-48DF-80BD-7BD1A3E5CB41}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0B2C2ADE-579E-48DF-80BD-7BD1A3E5CB41}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
