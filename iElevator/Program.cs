@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Threading;
 using Elevator;
 using ElevatorControl;
+using System.IO;
 
 namespace iElevator
 {
@@ -11,30 +12,26 @@ namespace iElevator
     {
         static void Main(string[] args)
         {
-            var elevatorControl = new ElevatorControlUnit(2);
+            var elevatorControl = new ElevatorControlUnit(2, 20);
+
+            string file = @"Users.txt";
+
+
+            foreach (var item in File.ReadLines(file))
+            {
+                var parameters = item.Split(',');
+
+                elevatorControl.QueueUsers(int.Parse(parameters[0]), int.Parse(parameters[1]), double.Parse(parameters[2]));
+            }
 
 
             while (true)
             {
+                var user = Console.ReadLine();
 
+                var parameters = user.Split(',');
 
-                Random rnd = new Random();
-                int requestedFloor = rnd.Next(1, 10);
-
-                var closestElevator = elevatorControl.FindClosestElevator(elevatorControl.GetElevators(), requestedFloor);
-
-
-                if (closestElevator != null)
-                {
-                    Console.WriteLine($"Sending elevator {closestElevator.id} to floor {requestedFloor}");
-                    closestElevator.ProcessRequests();
-                }
-                else
-                {
-                    Console.WriteLine("No suitable elevator found.");
-                }
-
-                Thread.Sleep(1000);
+                elevatorControl.QueueUsers(int.Parse(parameters[0]), int.Parse(parameters[1]), double.Parse(parameters[2]));
             }
 
 

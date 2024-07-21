@@ -6,11 +6,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Elevator\Elevator.csproj" />
-    <ProjectReference Include="..\User\Users.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Models\" />
   </ItemGroup>
 
 </Project>
