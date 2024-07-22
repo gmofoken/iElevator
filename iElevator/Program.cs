@@ -24,19 +24,21 @@ namespace iElevator
 
             var elevatorControl = new ElevatorControlUnit(floors, elevators);
 
-            string file = @"Users.txt";
+            //string file = @"Users.txt";
 
 
-            foreach (var item in File.ReadLines(file))
-            {
-                var parameters = item.Split(',');
+            //foreach (var item in File.ReadLines(file))
+            //{
+            //    var parameters = item.Split(',');
 
-                elevatorControl.QueueUsers(int.Parse(parameters[0]), int.Parse(parameters[1]), double.Parse(parameters[2]));
-            }
+            //    elevatorControl.QueueUsers(int.Parse(parameters[0]), int.Parse(parameters[1]), double.Parse(parameters[2]));
+            //}
 
 
             while (true)
             {
+                Console.WriteLine("Please enter user: C,T,W.");
+
                 var user = Console.ReadLine();
 
                 var parameters = user.Split(',');
@@ -52,8 +54,7 @@ namespace iElevator
 
             bool valid = true;
 
-            while (valid)
-            {
+
                 Console.WriteLine("Please Enter the type of elevators to simulate in below format");
                 Console.WriteLine("Each elevator is represented by a character and the number of comma separated characters will determine number of elevators");
                 Console.WriteLine("E = Express, L = Large,N = Normal");
@@ -66,26 +67,26 @@ namespace iElevator
 
                 
 
-                foreach (var item in parameters)
+            foreach (var item in parameters)
+            {
+                if (item.Length == 1 && new[] { "E", "L", "N" }.Contains(item))
                 {
-                    if (item.Length == 1 && new[] { "E", "L", "N" }.Contains(item))
-                    {
-                        if (item == "E")
-                            elevators.Add(ElevatorTypeEnum.Express);
-                        if (item == "L")
-                            elevators.Add(ElevatorTypeEnum.Large);
-                        if (item == "N")
-                            elevators.Add(ElevatorTypeEnum.Normal);
+                    if (item == "E")
+                        elevators.Add(ElevatorTypeEnum.Express);
+                    if (item == "L")
+                        elevators.Add(ElevatorTypeEnum.Large);
+                    if (item == "N")
+                        elevators.Add(ElevatorTypeEnum.Normal);
 
-                    }
-                    else
-                    {
-                        Console.WriteLine("Invalid input.");
-                        valid = false;
-                    }
                 }
-
+                else
+                {
+                    Console.WriteLine("Invalid input.");
+                    GetElevators();
+                }
             }
+
+            
 
             return elevators;
         } 
@@ -94,21 +95,20 @@ namespace iElevator
         {
             int floors = 0;
 
-            while (true)
-            {
-                Console.WriteLine("Please enter the number of floors");
-                var floorInput = Console.ReadLine();
+            
+            Console.WriteLine("Please enter the number of floors");
+            var floorInput = Console.ReadLine();
 
-                try
-                {
-                    floors = int.Parse(floorInput);
-                }
-                catch (Exception)
-                {
-                    continue;
-                }
-                break;
+            try
+            {
+                floors = int.Parse(floorInput);
             }
+            catch (Exception)
+            {
+                Console.WriteLine("Please enter an integer values");
+                SetNumberOfFloors();
+            }
+
             return floors;
         }
     }
