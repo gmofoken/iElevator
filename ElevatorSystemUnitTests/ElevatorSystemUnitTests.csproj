@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ElevatorControl\ElevatorControl.csproj" />
+    <ProjectReference Include="..\Elevator\Elevator.csproj" />
   </ItemGroup>
 
 </Project>

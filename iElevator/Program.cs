@@ -4,6 +4,11 @@ using System.Collections.Generic;
 using System.Threading;
 using Elevator;
 using ElevatorControl;
+using System.IO;
+using System.Threading.Tasks;
+using Users;
+using Elevator.Enums;
+using System.Linq;
 
 namespace iElevator
 {
@@ -11,52 +16,102 @@ namespace iElevator
     {
         static void Main(string[] args)
         {
-            var elevatorControl = new ElevatorControlUnit(2);
+
+            var elevators = GetElevators();
+
+            int floors = SetNumberOfFloors();
+
+
+            var elevatorControl = new ElevatorControlUnit(floors, elevators);
+
+            //string file = @"Users.txt";
+
+
+            //foreach (var item in File.ReadLines(file))
+            //{
+            //    var parameters = item.Split(',');
+
+            //    elevatorControl.QueueUsers(int.Parse(parameters[0]), int.Parse(parameters[1]), double.Parse(parameters[2]));
+            //}
 
 
             while (true)
             {
+                Console.WriteLine("Please enter user: C,T,W.");
+
+                var user = Console.ReadLine();
+
+                var parameters = user.Split(',');
+
+                elevatorControl.QueueUsers(int.Parse(parameters[0]), int.Parse(parameters[1]), double.Parse(parameters[2]));
+            }
+
+        }
+
+        public static List<ElevatorTypeEnum>  GetElevators()
+        {
+            var elevators = new List<ElevatorTypeEnum>();
+
+            bool valid = true;
 
 
-                Random rnd = new Random();
-                int requestedFloor = rnd.Next(1, 10);
+                Console.WriteLine("Please Enter the type of elevators to simulate in below format");
+                Console.WriteLine("Each elevator is represented by a character and the number of comma separated characters will determine number of elevators");
+                Console.WriteLine("E = Express, L = Large,N = Normal");
+                Console.WriteLine("E,L,N");
 
-                var closestElevator = elevatorControl.FindClosestElevator(elevatorControl.GetElevators(), requestedFloor);
+                elevators.Clear();
 
+                var elevatorsInput = Console.ReadLine();
+                var parameters = elevatorsInput.Split(',');
 
-                if (closestElevator != null)
+                
+
+            foreach (var item in parameters)
+            {
+                if (item.Length == 1 && new[] { "E", "L", "N" }.Contains(item))
                 {
-                    Console.WriteLine($"Sending elevator {closestElevator.id} to floor {requestedFloor}");
-                    closestElevator.ProcessRequests();
+                    if (item == "E")
+                        elevators.Add(ElevatorTypeEnum.Express);
+                    if (item == "L")
+                        elevators.Add(ElevatorTypeEnum.Large);
+                    if (item == "N")
+                        elevators.Add(ElevatorTypeEnum.Normal);
+
                 }
                 else
                 {
-                    Console.WriteLine("No suitable elevator found.");
+                    Console.WriteLine("Invalid input.");
+                    GetElevators();
                 }
-
-                Thread.Sleep(1000);
             }
 
+            
 
+            return elevators;
+        } 
 
-            //var elevatorControl = new ElevatorControl();
-            //var elevator1Display = new ElevatorDisplay();
-            //var elevator2Display = new ElevatorDisplay();
+        public static int SetNumberOfFloors()
+        {
+            int floors = 0;
 
-            //// Register observers for different elevators
-            //elevatorControl.RegisterObserver(1, elevator1Display);
-            //elevatorControl.RegisterObserver(2, elevator2Display);
+            
+            Console.WriteLine("Please enter the number of floors");
+            var floorInput = Console.ReadLine();
 
-            //// Simulate button presses
-            //elevatorControl.ButtonPressed(1, 3);
-            //elevatorControl.ButtonPressed(2, 5);
+            try
+            {
+                floors = int.Parse(floorInput);
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("Please enter an integer values");
+                SetNumberOfFloors();
+            }
 
-            //// Unregister observer for elevator 1
-            ////elevatorControl.UnregisterObserver(1, elevator1Display);
-
-            //// No notification for elevator 1 after unregistering
-            //elevatorControl.ButtonPressed(1, 4);
-
+            return floors;
         }
     }
+
+    
 }
