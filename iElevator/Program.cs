@@ -5,6 +5,10 @@ using System.Threading;
 using Elevator;
 using ElevatorControl;
 using System.IO;
+using System.Threading.Tasks;
+using Users;
+using Elevator.Enums;
+using System.Linq;
 
 namespace iElevator
 {
@@ -12,7 +16,13 @@ namespace iElevator
     {
         static void Main(string[] args)
         {
-            var elevatorControl = new ElevatorControlUnit(2, 20);
+
+            var elevators = GetElevators();
+
+            int floors = SetNumberOfFloors();
+
+
+            var elevatorControl = new ElevatorControlUnit(floors, elevators);
 
             string file = @"Users.txt";
 
@@ -34,26 +44,74 @@ namespace iElevator
                 elevatorControl.QueueUsers(int.Parse(parameters[0]), int.Parse(parameters[1]), double.Parse(parameters[2]));
             }
 
+        }
 
+        public static List<ElevatorTypeEnum>  GetElevators()
+        {
+            var elevators = new List<ElevatorTypeEnum>();
 
-            //var elevatorControl = new ElevatorControl();
-            //var elevator1Display = new ElevatorDisplay();
-            //var elevator2Display = new ElevatorDisplay();
+            bool valid = true;
 
-            //// Register observers for different elevators
-            //elevatorControl.RegisterObserver(1, elevator1Display);
-            //elevatorControl.RegisterObserver(2, elevator2Display);
+            while (valid)
+            {
+                Console.WriteLine("Please Enter the type of elevators to simulate in below format");
+                Console.WriteLine("Each elevator is represented by a character and the number of comma separated characters will determine number of elevators");
+                Console.WriteLine("E = Express, L = Large,N = Normal");
+                Console.WriteLine("E,L,N");
 
-            //// Simulate button presses
-            //elevatorControl.ButtonPressed(1, 3);
-            //elevatorControl.ButtonPressed(2, 5);
+                elevators.Clear();
 
-            //// Unregister observer for elevator 1
-            ////elevatorControl.UnregisterObserver(1, elevator1Display);
+                var elevatorsInput = Console.ReadLine();
+                var parameters = elevatorsInput.Split(',');
 
-            //// No notification for elevator 1 after unregistering
-            //elevatorControl.ButtonPressed(1, 4);
+                
 
+                foreach (var item in parameters)
+                {
+                    if (item.Length == 1 && new[] { "E", "L", "N" }.Contains(item))
+                    {
+                        if (item == "E")
+                            elevators.Add(ElevatorTypeEnum.Express);
+                        if (item == "L")
+                            elevators.Add(ElevatorTypeEnum.Large);
+                        if (item == "N")
+                            elevators.Add(ElevatorTypeEnum.Normal);
+
+                    }
+                    else
+                    {
+                        Console.WriteLine("Invalid input.");
+                        valid = false;
+                    }
+                }
+
+            }
+
+            return elevators;
+        } 
+
+        public static int SetNumberOfFloors()
+        {
+            int floors = 0;
+
+            while (true)
+            {
+                Console.WriteLine("Please enter the number of floors");
+                var floorInput = Console.ReadLine();
+
+                try
+                {
+                    floors = int.Parse(floorInput);
+                }
+                catch (Exception)
+                {
+                    continue;
+                }
+                break;
+            }
+            return floors;
         }
     }
+
+    
 }

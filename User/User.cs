@@ -1,5 +1,4 @@
-﻿using Elevator.Enums;
-using System;
+﻿using System;
 using Users.Enums;
 
 namespace Users
@@ -12,7 +11,6 @@ namespace Users
         public double Weight { get; set; }
 
         public UserAction CurrentAction { get; set; }
-        public Direction direction { get; set; }
 
         public User()
         {

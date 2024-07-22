@@ -7,11 +7,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "iElevator", "iElevator\iEle
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ElevatorControl", "ElevatorControl\ElevatorControl.csproj", "{7927EC26-BAA4-4928-ACDD-BA6ADFEE9E8D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ElevatorSystemUnitTests", "ElevatorSystemUnitTests\ElevatorSystemUnitTests.csproj", "{0B2C2ADE-579E-48DF-80BD-7BD1A3E5CB41}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ElevatorSystemUnitTests", "ElevatorSystemUnitTests\ElevatorSystemUnitTests.csproj", "{0B2C2ADE-579E-48DF-80BD-7BD1A3E5CB41}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Elevator", "Elevator\Elevator.csproj", "{3E61E026-5A07-4E8B-B286-C19BA4D2344E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Elevator", "Elevator\Elevator.csproj", "{3E61E026-5A07-4E8B-B286-C19BA4D2344E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Users", "User\Users.csproj", "{8A4C071B-8C92-461F-8394-8375673931D1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shared", "User\Shared.csproj", "{8A4C071B-8C92-461F-8394-8375673931D1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

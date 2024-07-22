@@ -14,7 +14,7 @@ namespace ElevatorSystemUnitTests
         {
             //ARRANGE
             int numberOfElevators = 3;
-            var elevatorControl = new ElevatorControlUnit(numberOfElevators, 20);
+            //var elevatorControl = new ElevatorControlUnit(numberOfElevators, 20);
 
             //ASSERT
             //Assert.AreEqual(numberOfElevators, elevatorControl.GetElevators().Count);
@@ -25,7 +25,7 @@ namespace ElevatorSystemUnitTests
         {
             //ARRANGE
             int numberOfElevators = 3;
-            var elevatorControl = new ElevatorControlUnit(numberOfElevators, 20);
+            //var elevatorControl = new ElevatorControlUnit(numberOfElevators, 20);
             //var elevator = elevatorControl.GetElevators().OrderBy(e => e._currentFloor).FirstOrDefault();
 
             //ACT

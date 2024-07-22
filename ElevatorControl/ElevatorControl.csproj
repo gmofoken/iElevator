@@ -6,7 +6,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Elevator\Elevator.csproj" />
-    <ProjectReference Include="..\User\Users.csproj" />
+    <ProjectReference Include="..\User\Shared.csproj" />
   </ItemGroup>
 
   <ItemGroup>

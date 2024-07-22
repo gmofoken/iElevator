@@ -1,32 +1,62 @@
 ﻿using Elevator.DTOs;
 using Elevator.Enums;
+using Elevator.Models;
+using Shared.DTOs;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Users;
+using Users.Enums;
 
 namespace Elevator.Services
 {
     public class ElevatorService
     {
-        private static readonly Lazy<ElevatorService> elevatorService = new Lazy<ElevatorService>(() => new ElevatorService(), true);
+        private static readonly Lazy<ElevatorService> elevatorService;
 
         private List<ElevatorUnit> _elevators = new List<ElevatorUnit>();
         private int _numberOfFloors = 0;
         private Queue<ElevatorRequest> _awaitingQueues = new Queue<ElevatorRequest>();
+        private List<Floor> _floors = new List<Floor>();
 
-        private ElevatorService() 
+        private bool _isElevatorLoading = false;
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
-            InitialiseElevators(2);
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+
+        public ElevatorService(List<ElevatorTypeEnum> elevators, int floors)
+        {
+            InitialiseElevators(elevators);
+            SetNumberOfFloors(floors);
+            InitialiseFloorQueues();
             Task.Run(() => ProcessQueues());
+        }
+
+
+        public static ElevatorService Instance => elevatorService.Value;
+
+        public void InitialiseFloorQueues()
+        {
+            for (int i = 1; i <= 20; i++)
+                _floors.Add(new Floor(i));
         }
 
         private void ProcessQueues()
         {
-            while (true) 
+            while (true)
             {
                 if (_awaitingQueues.Count > 0)
                 {
@@ -40,26 +70,85 @@ namespace Elevator.Services
                         _awaitingQueues.Enqueue(request);
                 }
 
-                Task.Delay(1000).Wait();
+                _elevators.Where(x => x.State == State.Loading).ToList().ForEach(elevator => {
+                    if (elevator.State == State.Loading)
+                    {
+                        _isElevatorLoading = true;
+
+                        elevator.AcitvateDoors();
+
+                        var floor = _floors.Where(x => x.FloorID == elevator.CurrentFLoor()).First();
+
+                        Queue<User> queue = null;
+                        Queue<User> newQueue = new Queue<User>();
+
+                        var currentDirection = elevator.GetCurrentDirection();
+
+
+
+                        if (currentDirection == Direction.None)
+                            queue = (floor.Queues.Up.Count > 0) ? floor.Queues.Up : floor.Queues.Down;
+                        else if (currentDirection == Direction.Up)
+                            queue = floor.Queues.Up;
+                        else
+                            queue = floor.Queues.Down;
+
+                        while (queue.Count > 0)
+                        {
+                            var user = queue.Dequeue();
+
+                            var load = elevator.LoadUsers(user);
+
+                            if (load != StateResponse.Success)
+                                newQueue.Enqueue(user);
+                        }
+
+                        if (elevator.CurrentDirection == Direction.Up)
+                        {
+                            _floors.Where(x => x.FloorID == elevator.CurrentFLoor()).First().Queues.Up = newQueue;
+                        }
+                        else
+                            _floors.Where(x => x.FloorID == elevator.CurrentFLoor()).First().Queues.Up = newQueue;
+
+
+                        Task.Delay(2000).Wait();
+
+
+                        _isElevatorLoading = false;
+                        elevator.AcitvateDoors();
+                    }
+
+                });
             }
         }
 
-        public static ElevatorService Instance => elevatorService.Value;
-
-        private void InitialiseElevators(int numOfElevators)
+        private void LoadUsers()
         {
-            for (int i = 1; i <= numOfElevators; i++)
+
+        }
+
+
+        private void InitialiseElevators(List<ElevatorTypeEnum> elevetors)
+        {
+            for (int i = 1; i <= elevetors.Count; i++)
             {
-                var elevator = new ElevatorUnit(new Random().Next(1, 10), i);
-                
+                var elevator = new ElevatorUnit(new Random().Next(1, 10), i, elevetors[i-1]);
+
+                var used = false;
+
                 _elevators.Add(elevator);
                 _elevators.Last().PropertyChanged += (sender, e) =>
                 {
                     var _l = sender as ElevatorUnit;
 
-                    //_elevators.Where(x => x.id == _l.id).First().CallElevator();
+                    var state = _l.State;
+
+                    if (state == State.Loading)
+                    {
+
+                    }
                 };
-                
+
             }
         }
 
@@ -73,16 +162,44 @@ namespace Elevator.Services
             _numberOfFloors = floors;
         }
 
-        public Tuple<int, int> CallElevator(ElevatorRequest request)
+        public void CallElevator(ElevatorRequest request)
         {
-            var elevator = FindClosestElevator(request);
 
-            if (elevator == null)
-                _awaitingQueues.Enqueue(request);
-            if (elevator != null && elevator.CurrentFLoor() != request.Floor) 
+
+            try
+            {
+                var elevator = FindClosestElevator(request);
+
                 elevator.QueueStops(request.Floor);
+            }
+            catch (Exception)
+            {
+                _awaitingQueues.Enqueue(request);
+            }
 
-            return new Tuple<int, int>(elevator.id, elevator.CurrentFLoor());
+
+
+        }
+
+        public void AddUserToQueue(User user) 
+        {
+            try
+            {
+                if (user.CurrentFloor - user.DestinationFloor > 0)
+                {
+                    _floors.Where(x => x.FloorID == user.CurrentFloor).FirstOrDefault().Queues.Down.Enqueue(user);
+                    _floors.Where(x => x.FloorID == user.CurrentFloor).FirstOrDefault().IsThereGroupGoingDown = true;
+                }
+                else
+                {
+                    _floors.Where(x => x.FloorID == user.CurrentFloor).FirstOrDefault().Queues.Up.Enqueue(user);
+                    _floors.Where(x => x.FloorID == user.CurrentFloor).FirstOrDefault().IsThereGroupGoingUp = true;
+                }
+            }
+            catch
+            {
+                Console.WriteLine("Invalid floor selection");
+            }
         }
 
         private ElevatorUnit FindClosestElevator(ElevatorRequest request)

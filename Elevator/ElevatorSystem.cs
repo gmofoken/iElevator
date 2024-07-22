@@ -1,6 +1,7 @@
 ﻿using Elevator.DTOs;
 using Elevator.Enums;
 using Elevator.Models;
+using Shared.DTOs;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -9,38 +10,19 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Users;
 
 namespace Elevator
 {
-    public class ElevatorUnit : INotifyPropertyChanged
+    public class ElevatorUnit : Elevators
     {
-        private static readonly object lockObject = new object();
-        private static ElevatorUnit instance = null;
-
-        private int _currentFloor { get; set; }
-        public int RequestedFloor { get; private set; }
-        public Direction CurrentDirection { get; private set; }
-        public Direction IntendedDirection { get; private set; }
+        
         private Queue<int> requests = new Queue<int>();
-        public int id { get; private set; }
-        public double weightLimit { get; set; }
-        public int MaxCapacity { get; set; }
+        public int ID { get; private set; }
         private bool isIdle { get; set; } = true;
         private bool isRunning { get; set; } = true;
-        public bool isDoorOpen { get; set; } = true;
-
-        public bool IsDoorOpen
-        {
-            get { return isDoorOpen; }
-            set 
-            { 
-                if (isDoorOpen != value)
-                {
-                    isDoorOpen = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
+        private bool IsDoorOpen { get; set; } = false;
+        private State state { get; set; }
 
         public bool IsIdle 
         {
@@ -55,18 +37,24 @@ namespace Elevator
             } 
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        public State State
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            get { return state; }
+            set
+            {
+                if (value != state)
+                {
+                    state = value;
+                    OnPropertyChanged();
+                }
+            }
         }
 
-        public ElevatorUnit(int initialFloor, int iD)
+        public ElevatorUnit(int initialFloor, int iD, ElevatorTypeEnum type) : base(type)
         {
-            _currentFloor = initialFloor;
+            CurrentFloor = initialFloor;
             CurrentDirection = Direction.None;
-            id = iD;
+            ID = iD;
             Task.Run(() => this.Run());
         }
 
@@ -77,7 +65,7 @@ namespace Elevator
 
         public int CurrentFLoor()
         {
-            return this._currentFloor;
+            return this.CurrentFloor;
         }
 
         public bool IsActive()
@@ -91,28 +79,104 @@ namespace Elevator
 
             while (isRunning)
             {
+                if (requests.Count == 0)
+                {
+                    isIdle = true;
+                    state = State.Waiting;
+                }
+                if (requests.Count() > 0 && state != State.Loading)
+                {
+                    state = State.Moving;
+
+                    ProcessRequests();
+
+                    Task.Delay(Speed).Wait();
+                }
                 
-
-                var test = id;
-
-                ProcessRequests();
-
-                Task.Delay(2000).Wait();
             }
+        }
+
+        public State GetCurrentState()
+        {
+            return state;
+        }
+
+        public Direction GetCurrentDirection() 
+        {
+            if (requests.Count == 0)
+                return Direction.None;
+            else
+                return ((CurrentFLoor() - requests.Peek()) > 0) ? Direction.Up : Direction.Down;
         }
 
         private void Stop()
         {
-            //if (!isIdle !)
+            while (state == State.Loading)
+            {
+            }
         }
 
 
-        private bool CheckWeight()
+
+        public void AcitvateDoors() 
+        { 
+            if (IsDoorOpen)
+            {
+                IsDoorOpen = false;
+                State = State.Moving;
+                Console.WriteLine(string.Format("Elevator {0} door is >>closing<<", ID));
+            }
+            else
+            {
+                IsDoorOpen = true;
+                Console.WriteLine(string.Format("Elevator {0} door is <<opening>>", ID));
+                for (int i = 0; i < Load.Users.Count; i++)
+                {
+                    if (Load.Users[i] != null && Load.Users[i].DestinationFloor == CurrentFloor)
+                    {
+                        Console.WriteLine($"{Load.Users[i].Id} has disembarked. ");
+                        Load.Weight -= Load.Users[i].Weight;
+                        Load.Capacity--;
+                        Load.Users.RemoveAt(i);
+
+                    }
+                }
+            }
+
+        }
+
+        public StateResponse LoadUsers(User user)
         {
+            if (this.Load.Capacity >= this.MaxCapacity)
+            {
+                Console.WriteLine($"Elevator {ID}: Capacity limit reached.");
+                return StateResponse.WeightException;
+            }
+            else if (!CheckWeight(user.Weight))
+            {
+                Console.WriteLine($"Elevator {ID}: Weight limit reached.");
+                return StateResponse.WeightException;
+            }
+            
 
+            this.Load.Users.Add(user);
 
-            return false;
+            Load.Weight += user.Weight;
+            Load.Capacity++;
+
+            Console.WriteLine($"User {user.Id} boarded the elevator.");
+
+            QueueStops(user.DestinationFloor);
+            return StateResponse.Success;
         }
+
+        private bool CheckWeight(double weight)
+        {
+            if ((this.Load.Weight + weight) > this.MaxWeight)
+                return false;
+            return true;
+        }
+
 
         private void ProcessRequests()
         {
@@ -120,23 +184,21 @@ namespace Elevator
             {
 
                 int nextFloor = requests.Peek();
-                Console.WriteLine($"Elevator {id} Moving to floor {nextFloor}. CurrentFoor: {_currentFloor}");
+                Console.WriteLine($"Elevator {ID} Moving to floor {nextFloor}. CurrentFoor: {CurrentFloor}");
 
-                if (_currentFloor < nextFloor)
-                    _currentFloor++;
-                else if (_currentFloor > nextFloor)
-                    _currentFloor--;
+                if (CurrentFloor < nextFloor)
+                    CurrentFloor++;
+                else if (CurrentFloor > nextFloor)
+                    CurrentFloor--;
 
-                //_currentFloor = (_currentFloor < nextFloor) ? _currentFloor++ : _currentFloor--;
 
-                if (_currentFloor ==  nextFloor && requests.Count != 0)
+                if (CurrentFloor ==  nextFloor && requests.Count != 0)
                 {
-                    Console.WriteLine($"Elevator {id} Arrived at floor {nextFloor}. CurrentFoor: {_currentFloor}");
+                    Console.WriteLine($"Elevator {ID} Arrived at floor {nextFloor}. CurrentFoor: {CurrentFloor}");
+                    state = State.Loading;
                     requests.Dequeue();
+                    Stop();
                 }
-                    
-
-
             }
             else
             {
@@ -147,34 +209,33 @@ namespace Elevator
 
         public int CalculateDistance(int requestedFloor)
         {
-            return Math.Abs(_currentFloor - requestedFloor);
+            return Math.Abs(CurrentFloor - requestedFloor);
         }
 
         public void QueueStops(int floor)
         {
             if (requests.Contains(floor))
             {
-                Console.WriteLine($"Floor {floor} already Queued for elevator {id} currently at {_currentFloor}");
-                
+                Console.WriteLine($"Floor {floor} already Queued for elevator {ID} currently at {CurrentFloor}");                
             }
             else
             {
-                Console.WriteLine($"Floor {floor} Queued for elevator {id} at {_currentFloor}");
+                Console.WriteLine($"Floor {floor} Queued for elevator {ID} at {CurrentFloor}");
                 requests.Enqueue(floor);
                 IsIdle = false;
             }
 
             if (requests.Count > 0) 
-                CurrentDirection = (_currentFloor < floor) ? Direction.Up : Direction.Down;
+                CurrentDirection = (CurrentFloor < floor) ? Direction.Up : Direction.Down;
         }
 
         public bool WillPassRequestedFloor(ElevatorRequest request)
         {
             if (isIdle)
                 return true;
-            else if (CurrentDirection == Direction.Up && request.Floor > _currentFloor && request.Direction == CurrentDirection)
+            else if (CurrentDirection == Direction.Up && request.Floor > CurrentFloor && request.Direction == CurrentDirection)
                 return true;
-            else if (CurrentDirection == Direction.Down && request.Floor < _currentFloor && request.Direction == CurrentDirection)
+            else if (CurrentDirection == Direction.Down && request.Floor < CurrentFloor && request.Direction == CurrentDirection)
                 return true;
             return false;
         }
