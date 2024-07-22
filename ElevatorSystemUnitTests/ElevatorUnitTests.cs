@@ -17,7 +17,7 @@ namespace ElevatorSystemUnitTests
         {
             //ARRANGE
             int floor = new Random().Next(1, 10);
-            var elevator = new ElevatorUnit(new Random().Next(1,10) ,1);
+            var elevator = new ElevatorUnit(new Random().Next(1,10) ,1, ElevatorTypeEnum.Express);
 
             //ACT
             var distance  = elevator.CalculateDistance(floor);
@@ -32,7 +32,7 @@ namespace ElevatorSystemUnitTests
         {
             //ARRANGE
             int floor = new Random().Next(1, 10);
-            var elevator = new ElevatorUnit(10, 1);
+            var elevator = new ElevatorUnit(10, 1, ElevatorTypeEnum.Express);
             var request1 = new ElevatorRequest() { Direction = Direction.Up, Floor = floor };
             var request2 = new ElevatorRequest() { Direction = Direction.Up, Floor = floor - 1 };
 
@@ -49,7 +49,7 @@ namespace ElevatorSystemUnitTests
         public void WillPassRequestedFloor()
         {
             //ARRANGE
-            var elevator = new ElevatorUnit(20, 1);
+            var elevator = new ElevatorUnit(20, 1, ElevatorTypeEnum.Express);
             var request1 = new ElevatorRequest() { Direction = Direction.Up, Floor = new Random().Next(1, 5) };
             var request2 = new ElevatorRequest() { Direction = Direction.Up, Floor = new Random().Next(6, 10) };
 
@@ -66,7 +66,7 @@ namespace ElevatorSystemUnitTests
         public void WillPassRequestedFloorDiffDirections()
         {
             //ARRANGE
-            var elevator = new ElevatorUnit(10, 1);
+            var elevator = new ElevatorUnit(10, 1, ElevatorTypeEnum.Express);
             var request1 = new ElevatorRequest() { Direction = Direction.Up, Floor = new Random().Next(11, 20) };
             var request2 = new ElevatorRequest() { Direction = Direction.Up, Floor = new Random().Next(1, 10) };
 
