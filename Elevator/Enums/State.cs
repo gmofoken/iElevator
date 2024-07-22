@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Users;
 
-namespace Shared.DTOs
+namespace Elevator.Enums
 {
-    public class Users
+    public enum State
     {
-        public List<User> Load { get; set; }
+        Waiting,
+        Loading,
+        Moving
     }
 }
