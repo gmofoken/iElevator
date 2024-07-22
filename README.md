@@ -10,4 +10,14 @@ E - Express
 L - Large
 N - Normal
 
+The input will be need to be a comma separated string with the elevator types.
 
+<<USER>>
+The user input will be 3 column comma separated string as below
+
+C,T,W
+C - Current Floor
+T - Target Floor
+W - Weight
+
+.... The requests will all be processed and then the control will wait for the user to input new instructions 
